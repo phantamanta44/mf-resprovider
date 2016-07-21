@@ -1,0 +1,15 @@
+name: MF-ResProvider
+version: 1.0
+description: resources
+author: Phanta
+website: https://phanta.xyz
+main: io.github.phantamanta44.mobafort.mfrp.RPPlugin
+depend: [Weaponize]
+commands:
+    wpn:
+      usage: '/mfrp'
+      description: reload
+permissions:
+    mfrp.admin:
+        description: admin powers activate
+        default: op
