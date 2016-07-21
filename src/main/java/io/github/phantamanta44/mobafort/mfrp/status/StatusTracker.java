@@ -29,7 +29,11 @@ public class StatusTracker {
 		IStatus status = registry.get(id);
 		if (status == null || amt < 1)
 			throw new IllegalArgumentException();
-		getOrCreateMap(player.getUniqueId()).add(status, amt);
+		TimedDecayMap<IStatus> map = getOrCreateMap(player.getUniqueId());
+		if (map.get(status) < status.getMaxStacks())
+			map.add(status, amt, status.getDuration());
+		else
+			map.resetDecayTimer(status);
 	}
 
 	public static boolean hasStatus(Player player, String id) {
