@@ -8,7 +8,7 @@ depend: [Weaponize]
 commands:
     wpn:
       usage: '/mfrp'
-      description: reload
+      description: hidden admin powers
 permissions:
     mfrp.admin:
         description: admin powers activate
