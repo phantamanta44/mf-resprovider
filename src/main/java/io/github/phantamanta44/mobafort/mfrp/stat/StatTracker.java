@@ -8,13 +8,14 @@ import io.github.phantamanta44.mobafort.mfrp.status.StatusTracker;
 import io.github.phantamanta44.mobafort.weaponize.stat.IStat;
 import io.github.phantamanta44.mobafort.weaponize.stat.Stats;
 import org.apache.commons.lang.mutable.MutableDouble;
+import org.apache.commons.lang.mutable.MutableFloat;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StatTracker {
 
@@ -36,14 +37,16 @@ public class StatTracker {
 			case HP:
 				return (IStat<T>)new MutableStat.HitPoints(player);
 			case HP_MISSING:
-				return new ImmutableStat<T>(player, stat, (T)Integer.valueOf(getStat(player, Stats.HP_MAX).getValue() - getStat(player, Stats.HP).getValue()));
+				return new ImmutableStat<>(player, stat, (T)Integer.valueOf(getStat(player, Stats.HP_MAX).getValue() - getStat(player, Stats.HP).getValue()));
+			case AD:
+				return new ImmutableStat<>(player, stat, (T)Integer.valueOf(getCached(player).getStat(Stats.AD).getValue() + getStat(player, Stats.BONUS_AD).getValue()));
 			default:
 				return getCached(player).getStat(stat);
 		}
 	}
 
 	public static void rescan(Player player, int toUpdate) {
-		StatCache cache = cached.get(player);
+		StatCache cache = cached.get(player.getUniqueId());
 		if (cache == null)
 			aggregate(player);
 		else
@@ -69,62 +72,67 @@ public class StatTracker {
 
 		private final Player player;
 		private final Map<Stats.StatType, Number> statMap;
-		private final Map<Stats.StatType, ProvidedStat<?>> providerMap;
+		private final OneToManyMap<Stats.StatType, ProvidedStat<?>, List<ProvidedStat<?>>> providerMap;
 
 		private StatCache(Player player) {
 			this.player = player;
 			this.statMap = new HashMap<>();
-			this.providerMap = new HashMap<>();
+			this.providerMap = new OneToManyMap<>(CopyOnWriteArrayList::new);
 			this.aggregate(SRC_ITEM | SRC_STATUS | SRC_BASE);
 		}
 
 		@SuppressWarnings("unchecked")
 		private <T extends Number> IStat<T> getStat(Stats<T> stat) {
 			Number val = statMap.get(stat.enumType);
-			return val != null ? new ImmutableStat<>(player, stat, (T)val) : new ImmutableStat(player, stat, 0);
+			return new ImmutableStat<>(player, stat, val != null ? (T)val : (T)reduceFromProviders(stat));
 		}
 
 		private void aggregate(int goal) {
 			if ((goal & SRC_ITEM) != 0) {
-				providerMap.entrySet().removeIf(e -> (e.getValue().src & SRC_ITEM) != 0);
+				providerMap.forEach((k, v) -> v.removeIf(e -> (e.src & SRC_ITEM) != 0));
 				// TODO Implement
 			}
 			if ((goal & SRC_STATUS) != 0) {
-				providerMap.entrySet().removeIf(e -> (e.getValue().src & SRC_STATUS) != 0);
+				providerMap.forEach((k, v) -> v.removeIf(e -> (e.src & SRC_STATUS) != 0));
 				StatusTracker.getStatus(player).stream()
 						.filter(e -> e.getKey() instanceof IStatStatus)
 						.forEach(e -> ((IStatStatus)e.getKey()).getProvidedStats(player, e.getValue()).forEach(this::addProvider));
 			}
 			if ((goal & SRC_BASE) != 0) {
-				providerMap.entrySet().removeIf(e -> (e.getValue().src & SRC_BASE) != 0);
+				providerMap.forEach((k, v) -> v.removeIf(e -> (e.src & SRC_BASE) != 0));
+				addProvider(new ProvidedStat<>(Stats.HP_MAX, 3100, SRC_BASE, ProvidedStat.ReduceType.ADD));
+				addProvider(new ProvidedStat<>(Stats.MANA_MAX, 3000, SRC_BASE, ProvidedStat.ReduceType.ADD));
+				addProvider(new ProvidedStat<>(Stats.AP, 250, SRC_BASE, ProvidedStat.ReduceType.ADD));
+				addProvider(new ProvidedStat<>(Stats.AD, 151, SRC_BASE, ProvidedStat.ReduceType.ADD));
 				// TODO Implement
 			}
-			reduceProviderValues();
 		}
 
-		private void reduceProviderValues() {
-			statMap.clear();
-			CollectionUtils.groupByProperty(providerMap.entrySet(), Map.Entry::getKey).forEach((k, v) -> {
+		private <T extends Number> Number reduceFromProviders(Stats<T> stat) {
+			List<ProvidedStat<?>> provs = providerMap.get(stat.enumType);
+			if (provs == null)
+				return MathUtils.box(0, stat.enumType.type);
+			OneToManyMap<ProvidedStat.ReduceType, ProvidedStat<?>, List<ProvidedStat<?>>> byType = CollectionUtils.groupByProperty(provs, p -> p.type);
+			if (byType.contains(ProvidedStat.ReduceType.ADD)) {
 				MutableDouble val = new MutableDouble();
-				OneToManyMap<ProvidedStat.ReduceType, ProvidedStat<?>, List<ProvidedStat<?>>> rt = CollectionUtils.groupByProperty(v.stream().map(Map.Entry::getValue).collect(Collectors.toList()), e -> e.type);
-				List<ProvidedStat<?>> add = rt.get(ProvidedStat.ReduceType.ADD);
-				if (add != null)
-					add.forEach(s -> val.add(s.value));
-				List<ProvidedStat<?>> percent = rt.get(ProvidedStat.ReduceType.PERC);
-				if (percent != null) {
-					MutableDouble ttlPct = new MutableDouble();
-					percent.forEach(s -> ttlPct.add(s.value));
-					val.setValue(val.doubleValue() * ttlPct.doubleValue());
+				byType.get(ProvidedStat.ReduceType.ADD).forEach(p -> val.add(p.value));
+				if (byType.contains(ProvidedStat.ReduceType.PERC)) {
+					MutableFloat perc = new MutableFloat();
+					byType.get(ProvidedStat.ReduceType.PERC).forEach(p -> perc.add(p.value));
+					val.setValue(val.doubleValue() * perc.doubleValue());
 				}
-				List<ProvidedStat<?>> multiply = rt.get(ProvidedStat.ReduceType.MULT);
-				if (multiply != null)
-					multiply.forEach(s -> val.setValue(val.doubleValue() * s.value.doubleValue()));
-				statMap.put(k, MathUtils.box(val.doubleValue(), k.type));
-			});
+				if (byType.contains(ProvidedStat.ReduceType.MULT))
+					byType.get(ProvidedStat.ReduceType.MULT).forEach(p -> val.setValue(val.doubleValue() * p.value.doubleValue()));
+				Number boxed = MathUtils.box(val.doubleValue(), stat.enumType.type);
+				statMap.put(stat.enumType, boxed);
+				return boxed;
+			}
+			return MathUtils.box(0, stat.enumType.type);
 		}
 
 		private void addProvider(ProvidedStat ps) {
 			providerMap.put(ps.stat.enumType, ps);
+			statMap.remove(ps.stat.enumType);
 		}
 
 	}

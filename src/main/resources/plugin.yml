@@ -6,7 +6,7 @@ website: https://phanta.xyz
 main: io.github.phantamanta44.mobafort.mfrp.RPPlugin
 depend: [Weaponize]
 commands:
-    wpn:
+    mfrp:
       usage: '/mfrp'
       description: hidden admin powers
 permissions:

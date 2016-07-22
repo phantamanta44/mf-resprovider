@@ -19,13 +19,19 @@ public class RPCommandExecutor implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0)
 			msgHelpNoArgs(sender);
-		switch (args[0].toLowerCase()) {
-			case "stats":
-				cmdStats(sender);
-				break;
-			default:
-				msgHelpNoArgs(sender);
-				break;
+		else {
+			switch (args[0].toLowerCase()) {
+				case "stats":
+					cmdStats(sender);
+					break;
+				case "hp":
+				case "mana":
+					cmdMutate(sender, args);
+					break;
+				default:
+					msgHelpNoArgs(sender);
+					break;
+			}
 		}
 		return true;
 	}
@@ -46,14 +52,34 @@ public class RPCommandExecutor implements CommandExecutor {
 		sender.sendMessage(msg.toArray(new String[msg.size()]));
 	}
 
+	private static void cmdMutate(CommandSender sender, String[] args) {
+		if (playerCheckFailed(sender) || argCountCheckFailed(sender, args, 2))
+			return;
+		IStat<Integer> stat;
+		if (args[0].equalsIgnoreCase("mana"))
+			stat = StatTracker.getStat((Player)sender, Stats.MANA);
+		else if (args[0].equalsIgnoreCase("hp"))
+			stat = StatTracker.getStat((Player)sender, Stats.HP);
+		else
+			throw new IllegalStateException("what");
+		stat.setValue(Integer.parseInt(args[1]));
+	}
+
 	private static void msgHelpNoArgs(CommandSender r) {
-		r.sendMessage("/mfrp <stats>");
+		r.sendMessage("/mfrp <stats|hp|mana>");
 	}
 
 	private static boolean playerCheckFailed(CommandSender sender) {
 		if (sender instanceof Player)
 			return false;
 		sender.sendMessage("Only players can use this command.");
+		return true;
+	}
+
+	private static boolean argCountCheckFailed(CommandSender sender, String[] args, int count) {
+		if (args.length >= count)
+			return false;
+		sender.sendMessage("Not enough arguments.");
 		return true;
 	}
 

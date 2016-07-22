@@ -25,6 +25,7 @@ public class RPPlugin extends JavaPlugin {
 		Stats.bindProvider(StatTracker::getStat);
 		StatTracker.init();
 		StatusTracker.init();
+		ResourceTracker.init();
 		Bukkit.getServer().getPluginManager().registerEvents(new DamageInterceptor(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(rbd = new ResourceBarDisplay(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new LogoutHandler(), this);
@@ -34,6 +35,7 @@ public class RPPlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		HandlerList.unregisterAll(this);
+		rbd.cleanUp();
 	}
 
 	public void onLogout(Player p) {

@@ -3,6 +3,8 @@ package io.github.phantamanta44.mobafort.mfrp.status;
 import io.github.phantamanta44.mobafort.lib.collection.DisposingNestedMap;
 import io.github.phantamanta44.mobafort.lib.collection.TimedDecayMap;
 import io.github.phantamanta44.mobafort.mfrp.RPPlugin;
+import io.github.phantamanta44.mobafort.mfrp.stat.StatTracker;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -14,7 +16,17 @@ public class StatusTracker {
 
 	public static void init() {
 		registry = new HashMap<>();
-		statusMap = new DisposingNestedMap<>(() -> new TimedDecayMap<>(RPPlugin.INSTANCE, 1L));
+		statusMap = new DisposingNestedMap<>(() -> {
+			TimedDecayMap<IStatus> tdm = new TimedDecayMap<>(RPPlugin.INSTANCE, 1L);
+			tdm.onSelfMutation(() -> {
+				Map.Entry<UUID, TimedDecayMap<IStatus>> entry = statusMap.entrySet().stream()
+						.filter(e -> e.getValue() == tdm)
+						.findAny().orElse(null);
+				if (entry != null)
+					StatTracker.rescan(Bukkit.getPlayer(entry.getKey()), StatTracker.SRC_STATUS);
+			});
+			return tdm;
+		});
 	}
 
 	public static void registerStatus(IStatus status) {

@@ -1,5 +1,6 @@
 package io.github.phantamanta44.mobafort.mfrp.event;
 
+import io.github.phantamanta44.mobafort.lib.math.MathUtils;
 import io.github.phantamanta44.mobafort.mfrp.resource.ResourceTracker;
 import io.github.phantamanta44.mobafort.mfrp.stat.StatTracker;
 import io.github.phantamanta44.mobafort.weaponize.Weaponize;
@@ -36,21 +37,37 @@ public class ResourceBarDisplay implements Listener, LongConsumer {
 				p.setLevel(ri.getHp());
 				float hpPerc = (float)ri.getHp() / maxHp.getValue().floatValue();
 				p.setExp(0.99F * hpPerc);
-				p.setHealth(p.getMaxHealth() * hpPerc);
+				p.setHealth(MathUtils.clamp(p.getMaxHealth() * hpPerc, 1, p.getMaxHealth()));
 				BossBar bar = getOrCreateBossBar(p);
 				bar.setTitle(Integer.toString(ri.getMana()));
-				bar.setProgress(0.01D + 0.99D * ((double)ri.getMana() / maxMana.getValue().doubleValue()));
+				bar.setProgress(MathUtils.clamp(0.01D + 0.99D * ((double)ri.getMana() / maxMana.getValue()), 0D, 1D));
 				bar.setStyle(getManaBarSegs(maxMana.getValue()));
 			});
 		}
 	}
 
 	public void uncache(Player player) {
-		manaBars.remove(player.getUniqueId());
+		uncache(player.getUniqueId());
+	}
+
+	public void uncache(UUID id) {
+		BossBar bar = manaBars.remove(id);
+		if (bar != null) {
+			bar.removeAll();
+			bar.setVisible(false);
+		}
+	}
+
+	public void cleanUp() {
+		manaBars.entrySet().removeIf(e -> {
+			e.getValue().removeAll();
+			e.getValue().setVisible(false);
+			return true;
+		});
 	}
 
 	private BossBar getOrCreateBossBar(Player p) {
-		BossBar bar = manaBars.get(p);
+		BossBar bar = manaBars.get(p.getUniqueId());
 		if (bar == null) {
 			bar = Bukkit.getServer().createBossBar("0", BarColor.BLUE, BarStyle.SEGMENTED_6);
 			bar.addPlayer(p);
