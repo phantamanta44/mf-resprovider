@@ -1,5 +1,6 @@
 package io.github.phantamanta44.mobafort.mfrp.stat;
 
+import io.github.phantamanta44.mobafort.mfrp.event.MobaEventManaExpenditure;
 import io.github.phantamanta44.mobafort.mfrp.resource.ResourceTracker;
 import io.github.phantamanta44.mobafort.weaponize.stat.AbstractStat;
 import io.github.phantamanta44.mobafort.weaponize.stat.Stats;
@@ -50,6 +51,9 @@ public abstract class MutableStat<T extends Number> extends AbstractStat<T> {
 
 		@Override
 		public void setValue(Integer val) {
+			int current = ResourceTracker.getMana(player);
+			if (val < current && val >= 0)
+				MobaEventManaExpenditure.fire(player, current - val);
 			ResourceTracker.setMana(player, val, StatTracker.getStat(player, Stats.MANA_MAX).getValue());
 		}
 

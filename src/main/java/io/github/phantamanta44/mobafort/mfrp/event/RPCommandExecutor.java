@@ -17,20 +17,22 @@ public class RPCommandExecutor implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (args.length == 0)
-			msgHelpNoArgs(sender);
-		else {
-			switch (args[0].toLowerCase()) {
-				case "stats":
-					cmdStats(sender);
-					break;
-				case "hp":
-				case "mana":
-					cmdMutate(sender, args);
-					break;
-				default:
-					msgHelpNoArgs(sender);
-					break;
+		if (!permCheckFailed(sender)) {
+			if (args.length == 0)
+				msgHelpNoArgs(sender);
+			else {
+				switch (args[0].toLowerCase()) {
+					case "stats":
+						cmdStats(sender);
+						break;
+					case "hp":
+					case "mana":
+						cmdMutate(sender, args);
+						break;
+					default:
+						msgHelpNoArgs(sender);
+						break;
+				}
 			}
 		}
 		return true;
@@ -80,6 +82,13 @@ public class RPCommandExecutor implements CommandExecutor {
 		if (args.length >= count)
 			return false;
 		sender.sendMessage("Not enough arguments.");
+		return true;
+	}
+
+	private static boolean permCheckFailed(CommandSender sender) {
+		if (sender.hasPermission("mfrp.admin"))
+			return false;
+		sender.sendMessage("No permission.");
 		return true;
 	}
 

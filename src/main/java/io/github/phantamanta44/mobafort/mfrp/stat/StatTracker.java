@@ -3,6 +3,8 @@ package io.github.phantamanta44.mobafort.mfrp.stat;
 import io.github.phantamanta44.mobafort.lib.collection.CollectionUtils;
 import io.github.phantamanta44.mobafort.lib.collection.OneToManyMap;
 import io.github.phantamanta44.mobafort.lib.math.MathUtils;
+import io.github.phantamanta44.mobafort.mfrp.item.IItem;
+import io.github.phantamanta44.mobafort.mfrp.item.ItemTracker;
 import io.github.phantamanta44.mobafort.mfrp.status.IStatStatus;
 import io.github.phantamanta44.mobafort.mfrp.status.StatusTracker;
 import io.github.phantamanta44.mobafort.weaponize.stat.IStat;
@@ -11,10 +13,7 @@ import org.apache.commons.lang.mutable.MutableDouble;
 import org.apache.commons.lang.mutable.MutableFloat;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StatTracker {
@@ -89,17 +88,24 @@ public class StatTracker {
 
 		private void aggregate(int goal) {
 			if ((goal & SRC_ITEM) != 0) {
-				providerMap.forEach((k, v) -> v.removeIf(e -> (e.src & SRC_ITEM) != 0));
-				// TODO Implement
+				removeProviders(SRC_ITEM);
+				Set<IItem> seen = new HashSet<>();
+				ItemTracker.get(player).forEach(i -> {
+					i.getValue().getCommonStats(player, i.getKey()).forEach(this::addProvider);
+					if (!seen.contains(i.getValue())) {
+						i.getValue().getUniqueStats(player, i.getKey()).forEach(this::addProvider);
+						seen.add(i.getValue());
+					}
+				});
 			}
 			if ((goal & SRC_STATUS) != 0) {
-				providerMap.forEach((k, v) -> v.removeIf(e -> (e.src & SRC_STATUS) != 0));
+				removeProviders(SRC_STATUS);
 				StatusTracker.getStatus(player).stream()
 						.filter(e -> e.getKey() instanceof IStatStatus)
 						.forEach(e -> ((IStatStatus)e.getKey()).getProvidedStats(player, e.getValue()).forEach(this::addProvider));
 			}
 			if ((goal & SRC_BASE) != 0) {
-				providerMap.forEach((k, v) -> v.removeIf(e -> (e.src & SRC_BASE) != 0));
+				removeProviders(SRC_BASE);
 				addProvider(new ProvidedStat<>(Stats.HP_MAX, 3100, SRC_BASE, ProvidedStat.ReduceType.ADD));
 				addProvider(new ProvidedStat<>(Stats.MANA_MAX, 3000, SRC_BASE, ProvidedStat.ReduceType.ADD));
 				addProvider(new ProvidedStat<>(Stats.AP, 250, SRC_BASE, ProvidedStat.ReduceType.ADD));
@@ -133,6 +139,16 @@ public class StatTracker {
 		private void addProvider(ProvidedStat ps) {
 			providerMap.put(ps.stat.enumType, ps);
 			statMap.remove(ps.stat.enumType);
+		}
+
+		private void removeProviders(int src) {
+			providerMap.forEach((k, v) -> v.removeIf(e -> {
+				if ((e.src & src) != 0) {
+					statMap.remove(e.stat.enumType);
+					return true;
+				}
+				return false;
+			}));
 		}
 
 	}
