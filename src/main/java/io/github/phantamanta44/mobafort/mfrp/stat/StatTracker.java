@@ -5,6 +5,7 @@ import io.github.phantamanta44.mobafort.lib.collection.OneToManyMap;
 import io.github.phantamanta44.mobafort.lib.math.MathUtils;
 import io.github.phantamanta44.mobafort.mfrp.item.IItem;
 import io.github.phantamanta44.mobafort.mfrp.item.ItemTracker;
+import io.github.phantamanta44.mobafort.mfrp.resource.ResourceTracker;
 import io.github.phantamanta44.mobafort.mfrp.status.IStatStatus;
 import io.github.phantamanta44.mobafort.mfrp.status.StatusTracker;
 import io.github.phantamanta44.mobafort.weaponize.stat.IStat;
@@ -112,6 +113,7 @@ public class StatTracker {
 				addProvider(new ProvidedStat<>(Stats.AD, 151, SRC_BASE, ProvidedStat.ReduceType.ADD));
 				// TODO Implement
 			}
+			ResourceTracker.capResources(player, getStat(Stats.HP_MAX).getValue(), getStat(Stats.MANA_MAX).getValue());
 		}
 
 		private <T extends Number> Number reduceFromProviders(Stats<T> stat) {
@@ -125,7 +127,7 @@ public class StatTracker {
 				if (byType.contains(ProvidedStat.ReduceType.PERC)) {
 					MutableFloat perc = new MutableFloat();
 					byType.get(ProvidedStat.ReduceType.PERC).forEach(p -> perc.add(p.value));
-					val.setValue(val.doubleValue() * perc.doubleValue());
+					val.setValue(val.doubleValue() * (1 + perc.doubleValue()));
 				}
 				if (byType.contains(ProvidedStat.ReduceType.MULT))
 					byType.get(ProvidedStat.ReduceType.MULT).forEach(p -> val.setValue(val.doubleValue() * p.value.doubleValue()));

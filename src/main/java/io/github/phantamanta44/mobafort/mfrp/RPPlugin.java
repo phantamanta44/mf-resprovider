@@ -1,9 +1,6 @@
 package io.github.phantamanta44.mobafort.mfrp;
 
-import io.github.phantamanta44.mobafort.mfrp.event.DamageInterceptor;
-import io.github.phantamanta44.mobafort.mfrp.event.LogoutHandler;
-import io.github.phantamanta44.mobafort.mfrp.event.RPCommandExecutor;
-import io.github.phantamanta44.mobafort.mfrp.event.ResourceBarDisplay;
+import io.github.phantamanta44.mobafort.mfrp.event.*;
 import io.github.phantamanta44.mobafort.mfrp.item.ItemTracker;
 import io.github.phantamanta44.mobafort.mfrp.resource.DamageProvider;
 import io.github.phantamanta44.mobafort.mfrp.resource.ResourceTracker;
@@ -34,6 +31,7 @@ public class RPPlugin extends JavaPlugin {
 		Bukkit.getServer().getPluginManager().registerEvents(new DamageInterceptor(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(rbd = new ResourceBarDisplay(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new LogoutHandler(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(new CrowdControlHandler(), this);
 		getCommand("mfrp").setExecutor(new RPCommandExecutor());
 	}
 

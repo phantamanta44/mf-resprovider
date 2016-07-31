@@ -23,18 +23,22 @@ public class DamageProvider implements IDamageProvider {
 			Player tgt = (Player) target;
 			if (dmg.getType() != Damage.DamageType.TRUE) {
 				int dmgRed = 0;
+				float steal = 0F;
 				switch (dmg.getType()) {
 					case PHYSICAL:
 						dmgRed = StatTracker.getStat(tgt, Stats.ARM).getValue() - StatTracker.getStat(src, Stats.ARM_PEN).getValue();
+						steal = StatTracker.getStat(src, Stats.LIFE_STEAL).getValue();
 						break;
 					case MAGIC:
 						dmgRed = StatTracker.getStat(tgt, Stats.MR).getValue() - StatTracker.getStat(src, Stats.MAG_PEN).getValue();
+						steal = StatTracker.getStat(src, Stats.SPELL_VAMP).getValue();
 						break;
 				}
 				if (dmgRed >= 0)
 					amt.setValue(amt.doubleValue() * 100 / (100 + dmgRed));
 				else
 					amt.setValue(amt.doubleValue() * (2 - (100 / (100 - dmgRed))));
+				ResourceTracker.addHp(src, (int)(amt.intValue() * steal), StatTracker.getStat(src, Stats.HP_MAX).getValue());
 			}
 			ResourceTracker.addHp(tgt, -amt.intValue(), StatTracker.getStat(tgt, Stats.HP_MAX).getValue());
 		}

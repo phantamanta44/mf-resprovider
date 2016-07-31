@@ -59,6 +59,12 @@ public class ResourceTracker {
 		ri.mana = MathUtils.clamp(ri.mana + amt, 0, cap);
 	}
 
+	public static void capResources(Player player, int hpMax, int manaMax) {
+		ResourceInfo ri = getOrCreateEntry(player.getUniqueId());
+		ri.hp = MathUtils.clamp(ri.hp, 0, hpMax);
+		ri.mana = MathUtils.clamp(ri.mana, 0, manaMax);
+	}
+
 	public static ResourceInfo getInfo(Player player) {
 		return getOrCreateEntry(player.getUniqueId());
 	}

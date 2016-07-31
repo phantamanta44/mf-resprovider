@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface IItem {
 
+	String getId();
+
 	ItemSig getType();
 
 	void initialize(Player player, ItemStack stack);

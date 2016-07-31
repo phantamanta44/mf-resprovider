@@ -3,6 +3,7 @@ package io.github.phantamanta44.mobafort.mfrp.status;
 import io.github.phantamanta44.mobafort.lib.collection.DisposingNestedMap;
 import io.github.phantamanta44.mobafort.lib.collection.TimedDecayMap;
 import io.github.phantamanta44.mobafort.mfrp.RPPlugin;
+import io.github.phantamanta44.mobafort.mfrp.event.MobaEventApplyCC;
 import io.github.phantamanta44.mobafort.mfrp.stat.StatTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -42,6 +43,12 @@ public class StatusTracker {
 		if (status == null || amt < 1)
 			throw new IllegalArgumentException();
 		TimedDecayMap<IStatus> map = getOrCreateMap(player.getUniqueId());
+		if (status instanceof ICCStatus) {
+			CrowdControl cc = ((ICCStatus)status).getCrowdControl(player, amt);
+			MobaEventApplyCC event = MobaEventApplyCC.fire(null, player, cc); // TODO Somehow pass the source player here
+			if (event.isCancelled())
+				return;
+		}
 		if (map.get(status) < status.getMaxStacks())
 			map.add(status, amt, status.getDuration());
 		else
