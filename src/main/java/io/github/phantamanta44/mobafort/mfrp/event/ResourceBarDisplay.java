@@ -42,6 +42,7 @@ public class ResourceBarDisplay implements Listener, LongConsumer {
 				bar.setTitle(Integer.toString(ri.getMana()));
 				bar.setProgress(MathUtils.clamp(0.01D + 0.99D * ((double)ri.getMana() / maxMana.getValue()), 0D, 1D));
 				bar.setStyle(getManaBarSegs(maxMana.getValue()));
+				p.setWalkSpeed(StatTracker.getStat(p, Stats.MOVE_SPEED).getValue().floatValue() / 400F);
 			});
 		}
 	}

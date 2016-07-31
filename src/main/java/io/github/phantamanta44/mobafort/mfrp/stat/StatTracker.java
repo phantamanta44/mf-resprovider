@@ -111,6 +111,7 @@ public class StatTracker {
 				addProvider(new ProvidedStat<>(Stats.MANA_MAX, 3000, SRC_BASE, ProvidedStat.ReduceType.ADD));
 				addProvider(new ProvidedStat<>(Stats.AP, 250, SRC_BASE, ProvidedStat.ReduceType.ADD));
 				addProvider(new ProvidedStat<>(Stats.AD, 151, SRC_BASE, ProvidedStat.ReduceType.ADD));
+				addProvider(new ProvidedStat<>(Stats.MOVE_SPEED, 460, SRC_BASE, ProvidedStat.ReduceType.ADD));
 				// TODO Implement
 			}
 			ResourceTracker.capResources(player, getStat(Stats.HP_MAX).getValue(), getStat(Stats.MANA_MAX).getValue());

@@ -3,6 +3,7 @@ package io.github.phantamanta44.mobafort.mfrp.status;
 import org.bukkit.entity.Player;
 
 import java.util.EnumSet;
+import java.util.Map;
 
 public enum CrowdControl {
 
@@ -26,6 +27,7 @@ public enum CrowdControl {
 	public static EnumSet<CrowdControl> getCCEffects(Player player) {
 		EnumSet<CrowdControl> set = EnumSet.noneOf(CrowdControl.class);
 		StatusTracker.getStatus(player).stream()
+				.map(Map.Entry::getKey)
 				.filter(s -> s instanceof ICCStatus)
 				.map(s -> (ICCStatus)s)
 				.forEach(s -> set.add(s.getCrowdControl(player, StatusTracker.getStacks(player, s.getId()))));
@@ -40,6 +42,12 @@ public enum CrowdControl {
 			state.castImpaired |= !e.canCast;
 		});
 		return state;
+	}
+
+	public static void cleanse(Player player) {
+		StatusTracker.getStatus(player).removeIf(e ->
+			e.getKey() instanceof ICCStatus && ((ICCStatus)e.getKey()).getCrowdControl(player, e.getValue()).canCleanse
+		);
 	}
 
 	public static class CCSnapshot {
