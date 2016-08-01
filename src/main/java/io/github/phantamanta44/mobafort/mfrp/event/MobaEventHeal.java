@@ -1,25 +1,24 @@
 package io.github.phantamanta44.mobafort.mfrp.event;
 
-import io.github.phantamanta44.mobafort.weaponize.stat.Damage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class MobaEventDamage extends Event {
+public class MobaEventHeal extends Event {
 
 	private static final HandlerList hl = new HandlerList();
 
 	private final Player source;
 	private final LivingEntity target;
-	private final Damage damage;
+	private int amount;
 	private boolean cancelled;
 
-	public MobaEventDamage(Player source, LivingEntity target, Damage damage) {
+	public MobaEventHeal(Player source, LivingEntity target, int amount) {
 		this.source = source;
 		this.target = target;
-		this.damage = damage;
+		this.amount = amount;
 		this.cancelled = false;
 	}
 
@@ -31,8 +30,12 @@ public class MobaEventDamage extends Event {
 		return target;
 	}
 
-	public Damage getDamage() {
-		return damage;
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amt) {
+		this.amount = amt;
 	}
 
 	public void setCancelled(boolean cancelled) {
@@ -48,8 +51,8 @@ public class MobaEventDamage extends Event {
 		return hl;
 	}
 
-	public static MobaEventDamage fire(Player source, LivingEntity target, Damage damage) {
-		MobaEventDamage event = new MobaEventDamage(source, target, damage);
+	public static MobaEventHeal fire(Player source, LivingEntity target, int amt) {
+		MobaEventHeal event = new MobaEventHeal(source, target, amt);
 		Bukkit.getServer().getPluginManager().callEvent(event);
 		return event;
 	}

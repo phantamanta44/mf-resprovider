@@ -52,9 +52,13 @@ public abstract class MutableStat<T extends Number> extends AbstractStat<T> {
 		@Override
 		public void setValue(Integer val) {
 			int current = ResourceTracker.getMana(player);
-			if (val < current && val >= 0)
-				MobaEventManaExpenditure.fire(player, current - val);
-			ResourceTracker.setMana(player, val, StatTracker.getStat(player, Stats.MANA_MAX).getValue());
+			if (val < current && val >= 0) {
+				MobaEventManaExpenditure event = MobaEventManaExpenditure.fire(player, current - val);
+				if (!event.isCancelled())
+					ResourceTracker.setMana(player, current - event.getAmount(), StatTracker.getStat(player, Stats.MANA_MAX).getValue());
+			}
+			else
+				ResourceTracker.setMana(player, val, StatTracker.getStat(player, Stats.MANA_MAX).getValue());
 		}
 
 	}

@@ -10,11 +10,13 @@ public class MobaEventManaExpenditure extends Event {
 	private static final HandlerList hl = new HandlerList();
 
 	private final Player player;
-	private final int amount;
+	private int amount;
+	private boolean cancelled;
 
 	public MobaEventManaExpenditure(Player player, int amount) {
 		this.player = player;
 		this.amount = amount;
+		this.cancelled = false;
 	}
 
 	public Player getPlayer() {
@@ -23,6 +25,18 @@ public class MobaEventManaExpenditure extends Event {
 
 	public int getAmount() {
 		return amount;
+	}
+
+	public void setAmount(int amt) {
+		this.amount = amt;
+	}
+
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
+	}
+
+	public boolean isCancelled() {
+		return cancelled;
 	}
 
 	@Override
