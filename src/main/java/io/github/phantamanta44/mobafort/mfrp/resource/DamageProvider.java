@@ -21,7 +21,7 @@ public class DamageProvider implements IDamageProvider {
 		MutableDouble amt = new MutableDouble(dmg.getBaseDmg());
 		dmg.getDamages().forEach(e -> amt.add(e.getValue() * StatTracker.getStat(src, e.getKey()).getValue().doubleValue()));
 		if (Math.random() <= StatTracker.getStat(src, Stats.CRIT_CHANCE).getValue())
-			amt.setValue(amt.doubleValue() * 2D * (1D + StatTracker.getStat(src, Stats.CRIT_DMG).getValue()));
+			amt.setValue(amt.doubleValue() * (2D + StatTracker.getStat(src, Stats.CRIT_DMG).getValue()));
 		if (target instanceof Player) {
 			Player tgt = (Player)target;
 			if (dmg.getType() != Damage.DamageType.TRUE) {
