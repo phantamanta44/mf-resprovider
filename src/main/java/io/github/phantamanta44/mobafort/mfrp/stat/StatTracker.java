@@ -3,7 +3,6 @@ package io.github.phantamanta44.mobafort.mfrp.stat;
 import io.github.phantamanta44.mobafort.lib.collection.CollectionUtils;
 import io.github.phantamanta44.mobafort.lib.collection.OneToManyMap;
 import io.github.phantamanta44.mobafort.lib.math.MathUtils;
-import io.github.phantamanta44.mobafort.mfrp.item.IItem;
 import io.github.phantamanta44.mobafort.mfrp.item.ItemTracker;
 import io.github.phantamanta44.mobafort.mfrp.resource.ResourceTracker;
 import io.github.phantamanta44.mobafort.mfrp.status.IStatStatus;
@@ -90,13 +89,14 @@ public class StatTracker {
 		private void aggregate(int goal) {
 			if ((goal & SRC_ITEM) != 0) {
 				removeProviders(SRC_ITEM);
-				Set<IItem> seen = new HashSet<>();
+				Set<String> seen = new HashSet<>();
 				ItemTracker.get(player).forEach(i -> {
 					i.getValue().getCommonStats(player, i.getKey()).forEach(this::addProvider);
-					if (!seen.contains(i.getValue())) {
-						i.getValue().getUniqueStats(player, i.getKey()).forEach(this::addProvider);
-						seen.add(i.getValue());
-					}
+					i.getValue().getUniqueStats(player, i.getKey()).entrySet().stream()
+							.filter(e -> !seen.contains(e.getKey()))
+							.peek(e -> seen.add(e.getKey()))
+							.map(Map.Entry::getValue)
+							.forEach(this::addProvider);
 				});
 			}
 			if ((goal & SRC_STATUS) != 0) {

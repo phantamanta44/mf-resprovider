@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IItem {
 
@@ -19,6 +20,6 @@ public interface IItem {
 
 	List<ProvidedStat<?>> getCommonStats(Player player, ItemStack stack);
 
-	List<ProvidedStat<?>> getUniqueStats(Player player, ItemStack stack);
+	Map<String, ProvidedStat<?>> getUniqueStats(Player player, ItemStack stack);
 
 }
