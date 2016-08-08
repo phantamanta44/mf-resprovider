@@ -1,6 +1,7 @@
 package io.github.phantamanta44.mobafort.mfrp.event;
 
 import io.github.phantamanta44.mobafort.mfrp.status.CrowdControl;
+import io.github.phantamanta44.mobafort.mfrp.status.IAutoAttackSpell;
 import io.github.phantamanta44.mobafort.weaponize.Weaponize;
 import io.github.phantamanta44.mobafort.weaponize.event.EventSpellCast;
 import org.bukkit.Bukkit;
@@ -19,7 +20,11 @@ public class CrowdControlHandler implements Listener, LongConsumer {
 
 	@EventHandler
 	public void onCast(EventSpellCast event) {
-		if (CrowdControl.getControlState(event.getPlayer()).isCastImpaired()) // TODO Special case for autoattacks
+		if (event.getSpell().getTemplate() instanceof IAutoAttackSpell) {
+			if (CrowdControl.getControlState(event.getPlayer()).isAutoImpaired())
+				event.setCancelled(true);
+		}
+		else if (CrowdControl.getControlState(event.getPlayer()).isCastImpaired())
 			event.setCancelled(true);
 	}
 
