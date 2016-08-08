@@ -7,6 +7,6 @@ import java.util.Collection;
 
 public interface IStatStatus extends IStatus {
 
-	<T extends Number> Collection<ProvidedStat<T>> getProvidedStats(Player player, int stacks);
+	Collection<ProvidedStat<?>> getProvidedStats(Player player, int stacks);
 
 }
