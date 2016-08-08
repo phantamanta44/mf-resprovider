@@ -1,11 +1,12 @@
 package io.github.phantamanta44.mobafort.mfrp.resource;
 
 import io.github.phantamanta44.mobafort.mfrp.event.MobaEventDamage;
+import io.github.phantamanta44.mobafort.mfrp.event.MobaEventDamageByNPC;
 import io.github.phantamanta44.mobafort.mfrp.event.MobaEventHeal;
-import io.github.phantamanta44.mobafort.mfrp.stat.IStatted;
 import io.github.phantamanta44.mobafort.mfrp.stat.StatTracker;
 import io.github.phantamanta44.mobafort.weaponize.stat.Damage;
 import io.github.phantamanta44.mobafort.weaponize.stat.IDamageProvider;
+import io.github.phantamanta44.mobafort.weaponize.stat.IStatted;
 import io.github.phantamanta44.mobafort.weaponize.stat.Stats;
 import org.apache.commons.lang.mutable.MutableDouble;
 import org.bukkit.entity.LivingEntity;
@@ -69,6 +70,56 @@ public class DamageProvider implements IDamageProvider {
 		}
 		else
 			target.damage(amt.doubleValue() / 5D, src);
+	}
+
+	@Override
+	public void damageEntity(Damage dmg, IStatted src, LivingEntity target) {
+		MobaEventDamageByNPC event = MobaEventDamageByNPC.fire(src, target, dmg);
+		if (event.isCancelled())
+			return;
+		MutableDouble amt = new MutableDouble(dmg.getBaseDmg());
+		dmg.getDamages().forEach(e -> amt.add(e.getValue() * src.getStat(e.getKey()).doubleValue()));
+		if (Math.random() <= src.getStat(Stats.CRIT_CHANCE))
+			amt.setValue(amt.doubleValue() * (2D + src.getStat(Stats.CRIT_DMG)));
+		if (target instanceof Player) {
+			Player tgt = (Player)target;
+			if (dmg.getType() != Damage.DamageType.TRUE) {
+				int dmgRed = 0;
+				switch (dmg.getType()) {
+					case PHYSICAL:
+						dmgRed = StatTracker.getStat(tgt, Stats.ARM).getValue() - src.getStat(Stats.ARM_PEN);
+						break;
+					case MAGIC:
+						dmgRed = StatTracker.getStat(tgt, Stats.MR).getValue() - src.getStat(Stats.MAG_PEN);
+						break;
+				}
+				if (dmgRed >= 0)
+					amt.setValue(amt.doubleValue() * 100 / (100 + dmgRed));
+				else
+					amt.setValue(amt.doubleValue() * (2 - (100 / (100 - dmgRed))));
+			}
+			ResourceTracker.addHp(tgt, -amt.intValue(), StatTracker.getStat(tgt, Stats.HP_MAX).getValue());
+		} else if (target instanceof IStatted) {
+			IStatted tgt = (IStatted)target;
+			if (dmg.getType() != Damage.DamageType.TRUE) {
+				int dmgRed = 0;
+				switch (dmg.getType()) {
+					case PHYSICAL:
+						dmgRed = tgt.getStat(Stats.ARM) - src.getStat(Stats.ARM_PEN);
+						break;
+					case MAGIC:
+						dmgRed = tgt.getStat(Stats.MR) - src.getStat(Stats.MAG_PEN);
+						break;
+				}
+				if (dmgRed >= 0)
+					amt.setValue(amt.doubleValue() * 100 / (100 + dmgRed));
+				else
+					amt.setValue(amt.doubleValue() * (2 - (100 / (100 - dmgRed))));
+			}
+			target.damage(amt.intValue());
+		}
+		else
+			target.damage(amt.doubleValue() / 5D);
 	}
 
 	@Override
