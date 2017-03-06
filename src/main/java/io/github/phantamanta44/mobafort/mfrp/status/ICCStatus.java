@@ -4,6 +4,6 @@ import org.bukkit.entity.Player;
 
 public interface ICCStatus extends IStatus {
 
-	CrowdControl getCrowdControl(Player player, int stacks);
+    CrowdControl getCrowdControl(Player player, int stacks);
 
 }

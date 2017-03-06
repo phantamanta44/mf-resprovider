@@ -9,53 +9,53 @@ import org.bukkit.event.HandlerList;
 
 public class MobaEventDamageByNPC extends Event {
 
-	private static final HandlerList hl = new HandlerList();
+    private static final HandlerList hl = new HandlerList();
 
-	public static HandlerList getHandlerList() {
-		return hl;
-	}
+    public static HandlerList getHandlerList() {
+        return hl;
+    }
 
-	private final IStatted source;
-	private final LivingEntity target;
-	private final Damage damage;
-	private boolean cancelled;
+    private final IStatted source;
+    private final LivingEntity target;
+    private final Damage damage;
+    private boolean cancelled;
 
-	public MobaEventDamageByNPC(IStatted source, LivingEntity target, Damage damage) {
-		this.source = source;
-		this.target = target;
-		this.damage = damage;
-		this.cancelled = false;
-	}
+    public MobaEventDamageByNPC(IStatted source, LivingEntity target, Damage damage) {
+        this.source = source;
+        this.target = target;
+        this.damage = damage;
+        this.cancelled = false;
+    }
 
-	public IStatted getSource() {
-		return source;
-	}
+    public IStatted getSource() {
+        return source;
+    }
 
-	public LivingEntity getTarget() {
-		return target;
-	}
+    public LivingEntity getTarget() {
+        return target;
+    }
 
-	public Damage getDamage() {
-		return damage;
-	}
+    public Damage getDamage() {
+        return damage;
+    }
 
-	public void setCancelled(boolean cancelled) {
-		this.cancelled = cancelled;
-	}
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
 
-	public boolean isCancelled() {
-		return cancelled;
-	}
+    public boolean isCancelled() {
+        return cancelled;
+    }
 
-	@Override
-	public HandlerList getHandlers() {
-		return hl;
-	}
+    @Override
+    public HandlerList getHandlers() {
+        return hl;
+    }
 
-	public static MobaEventDamageByNPC fire(IStatted source, LivingEntity target, Damage damage) {
-		MobaEventDamageByNPC event = new MobaEventDamageByNPC(source, target, damage);
-		Bukkit.getServer().getPluginManager().callEvent(event);
-		return event;
-	}
+    public static MobaEventDamageByNPC fire(IStatted source, LivingEntity target, Damage damage) {
+        MobaEventDamageByNPC event = new MobaEventDamageByNPC(source, target, damage);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        return event;
+    }
 
 }

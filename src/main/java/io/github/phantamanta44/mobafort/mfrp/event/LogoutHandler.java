@@ -7,9 +7,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class LogoutHandler implements Listener {
 
-	@EventHandler
-	public void onLogout(PlayerQuitEvent event) {
-		RPPlugin.INSTANCE.onLogout(event.getPlayer());
-	}
+    @EventHandler
+    public void onLogout(PlayerQuitEvent event) {
+        RPPlugin.INSTANCE.onLogout(event.getPlayer());
+    }
 
 }

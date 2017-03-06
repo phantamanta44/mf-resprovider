@@ -8,52 +8,52 @@ import org.bukkit.event.HandlerList;
 
 public class MobaEventApplyCC extends Event {
 
-	private static final HandlerList hl = new HandlerList();
+    private static final HandlerList hl = new HandlerList();
 
-	public static HandlerList getHandlerList() {
-		return hl;
-	}
+    public static HandlerList getHandlerList() {
+        return hl;
+    }
 
-	private Player target, source;
-	private CrowdControl type;
-	private boolean cancelled;
+    private Player target, source;
+    private CrowdControl type;
+    private boolean cancelled;
 
-	public MobaEventApplyCC(Player source, Player target, CrowdControl type) {
-		this.target = target;
-		this.source = source;
-		this.type = type;
-		this.cancelled = false;
-	}
+    public MobaEventApplyCC(Player source, Player target, CrowdControl type) {
+        this.target = target;
+        this.source = source;
+        this.type = type;
+        this.cancelled = false;
+    }
 
-	public Player getTarget() {
-		return target;
-	}
+    public Player getTarget() {
+        return target;
+    }
 
-	public Player getSource() {
-		return source;
-	}
+    public Player getSource() {
+        return source;
+    }
 
-	public CrowdControl getCC() {
-		return type;
-	}
+    public CrowdControl getCC() {
+        return type;
+    }
 
-	public void setCancelled(boolean cancelled) {
-		this.cancelled = cancelled;
-	}
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
 
-	public boolean isCancelled() {
-		return cancelled;
-	}
+    public boolean isCancelled() {
+        return cancelled;
+    }
 
-	@Override
-	public HandlerList getHandlers() {
-		return hl;
-	}
+    @Override
+    public HandlerList getHandlers() {
+        return hl;
+    }
 
-	public static MobaEventApplyCC fire(Player source, Player target, CrowdControl type) {
-		MobaEventApplyCC event = new MobaEventApplyCC(source, target, type);
-		Bukkit.getServer().getPluginManager().callEvent(event);
-		return event;
-	}
+    public static MobaEventApplyCC fire(Player source, Player target, CrowdControl type) {
+        MobaEventApplyCC event = new MobaEventApplyCC(source, target, type);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        return event;
+    }
 
 }

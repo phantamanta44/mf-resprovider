@@ -2,20 +2,20 @@ package io.github.phantamanta44.mobafort.mfrp.status;
 
 public interface IStatus {
 
-	String getId();
+    String getId();
 
-	String getName();
+    String getName();
 
-	String getDescription();
+    String getDescription();
 
-	boolean isBuff();
+    boolean isBuff();
 
-	default long getDuration() {
-		return -1L;
-	}
+    default long getDuration() {
+        return -1L;
+    }
 
-	default int getMaxStacks() {
-		return 1;
-	}
+    default int getMaxStacks() {
+        return 1;
+    }
 
 }

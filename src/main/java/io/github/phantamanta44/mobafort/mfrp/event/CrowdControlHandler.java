@@ -14,30 +14,30 @@ import java.util.function.LongConsumer;
 
 public class CrowdControlHandler implements Listener, LongConsumer {
 
-	public CrowdControlHandler() {
-		Weaponize.INSTANCE.registerTickHandler(this);
-	}
+    public CrowdControlHandler() {
+        Weaponize.INSTANCE.registerTickHandler(this);
+    }
 
-	@EventHandler
-	public void onCast(EventSpellCast event) {
-		if (event.getSpell().getTemplate() instanceof IAutoAttackSpell) {
-			if (CrowdControl.getControlState(event.getPlayer()).isAutoImpaired())
-				event.setCancelled(true);
-		}
-		else if (CrowdControl.getControlState(event.getPlayer()).isCastImpaired())
-			event.setCancelled(true);
-	}
+    @EventHandler
+    public void onCast(EventSpellCast event) {
+        if (event.getSpell().getTemplate() instanceof IAutoAttackSpell) {
+            if (CrowdControl.getControlState(event.getPlayer()).isAutoImpaired())
+                event.setCancelled(true);
+        }
+        else if (CrowdControl.getControlState(event.getPlayer()).isCastImpaired())
+            event.setCancelled(true);
+    }
 
-	@Override
-	public void accept(long tick) {
-		if (tick % 3 == 0) {
-			Bukkit.getServer().getOnlinePlayers().stream()
-					.filter(p -> CrowdControl.getControlState(p).isMoveImpaired())
-					.forEach(p -> {
-						p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, -4, true, false));
-						p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 3, 160, true, false));
-					});
-		}
-	}
+    @Override
+    public void accept(long tick) {
+        if (tick % 3 == 0) {
+            Bukkit.getServer().getOnlinePlayers().stream()
+                    .filter(p -> CrowdControl.getControlState(p).isMoveImpaired())
+                    .forEach(p -> {
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, -4, true, false));
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 3, 160, true, false));
+                    });
+        }
+    }
 
 }

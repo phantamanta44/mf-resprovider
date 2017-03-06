@@ -6,16 +6,16 @@ import org.bukkit.entity.Player;
 
 public class ImmutableStat<T extends Number> extends AbstractStat<T> {
 
-	private T value;
+    private T value;
 
-	public ImmutableStat(Player player, Stats<T> type, T value) {
-		super(player, type);
-		this.value = value;
-	}
+    public ImmutableStat(Player player, Stats<T> type, T value) {
+        super(player, type);
+        this.value = value;
+    }
 
-	@Override
-	public T getValue() {
-		return value;
-	}
+    @Override
+    public T getValue() {
+        return value;
+    }
 
 }

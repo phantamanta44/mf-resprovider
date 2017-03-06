@@ -9,36 +9,36 @@ import java.util.stream.Stream;
 
 public class ItemRegistry {
 
-	private static Map<String, IItem> itemMap;
+    private static Map<String, IItem> itemMap;
 
-	public static void init() {
-		itemMap = new HashMap<>();
-	}
+    public static void init() {
+        itemMap = new HashMap<>();
+    }
 
-	public static void register(IItem item) {
-		itemMap.put(item.getId(), item);
-	}
+    public static void register(IItem item) {
+        itemMap.put(item.getId(), item);
+    }
 
-	public static IItem get(ItemStack stack) {
-		return itemMap.values().stream()
-				.filter(e -> e.getType().matches(stack))
-				.findAny()
-				.orElse(null);
-	}
+    public static IItem get(ItemStack stack) {
+        return itemMap.values().stream()
+                .filter(e -> e.getType().matches(stack))
+                .findAny()
+                .orElse(null);
+    }
 
-	public static IItem get(ItemSig sig) {
-		return itemMap.values().stream()
-				.filter(e -> e.getType().equals(sig))
-				.findAny()
-				.orElse(null);
-	}
+    public static IItem get(ItemSig sig) {
+        return itemMap.values().stream()
+                .filter(e -> e.getType().equals(sig))
+                .findAny()
+                .orElse(null);
+    }
 
-	public static IItem get(String id) {
-		return itemMap.get(id);
-	}
+    public static IItem get(String id) {
+        return itemMap.get(id);
+    }
 
-	public static Stream<IItem> stream() {
-		return itemMap.values().stream();
-	}
+    public static Stream<IItem> stream() {
+        return itemMap.values().stream();
+    }
 
 }

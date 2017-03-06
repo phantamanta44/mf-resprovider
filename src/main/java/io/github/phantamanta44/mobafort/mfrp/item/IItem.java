@@ -10,16 +10,16 @@ import java.util.Map;
 
 public interface IItem {
 
-	String getId();
+    String getId();
 
-	ItemSig getType();
+    ItemSig getType();
 
-	void initialize(Player player, ItemStack stack);
+    void initialize(Player player, ItemStack stack);
 
-	void update(long tick, Player player, ItemStack stack);
+    void update(long tick, Player player, ItemStack stack);
 
-	List<ProvidedStat<?>> getCommonStats(Player player, ItemStack stack);
+    List<ProvidedStat<?>> getCommonStats(Player player, ItemStack stack);
 
-	Map<String, ProvidedStat<?>> getUniqueStats(Player player, ItemStack stack);
+    Map<String, ProvidedStat<?>> getUniqueStats(Player player, ItemStack stack);
 
 }

@@ -15,36 +15,36 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class RPPlugin extends JavaPlugin {
 
-	public static RPPlugin INSTANCE;
+    public static RPPlugin INSTANCE;
 
-	private ResourceBarDisplay rbd;
+    private ResourceBarDisplay rbd;
 
-	@Override
-	public void onEnable() {
-		INSTANCE = this;
-		Damage.bindProvider(new DamageProvider());
-		Stats.bindProvider(StatTracker::getStat);
-		StatTracker.init();
-		StatusTracker.init();
-		ResourceTracker.init();
-		ItemTracker.init();
-		Bukkit.getServer().getPluginManager().registerEvents(new DamageInterceptor(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(rbd = new ResourceBarDisplay(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(new LogoutHandler(), this);
-		Bukkit.getServer().getPluginManager().registerEvents(new CrowdControlHandler(), this);
-		getCommand("mfrp").setExecutor(new RPCommandExecutor());
-	}
+    @Override
+    public void onEnable() {
+        INSTANCE = this;
+        Damage.bindProvider(new DamageProvider());
+        Stats.bindProvider(StatTracker::getStat);
+        StatTracker.init();
+        StatusTracker.init();
+        ResourceTracker.init();
+        ItemTracker.init();
+        Bukkit.getServer().getPluginManager().registerEvents(new DamageInterceptor(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(rbd = new ResourceBarDisplay(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new LogoutHandler(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new CrowdControlHandler(), this);
+        getCommand("mfrp").setExecutor(new RPCommandExecutor());
+    }
 
-	@Override
-	public void onDisable() {
-		HandlerList.unregisterAll(this);
-		rbd.cleanUp();
-	}
+    @Override
+    public void onDisable() {
+        HandlerList.unregisterAll(this);
+        rbd.cleanUp();
+    }
 
-	public void onLogout(Player p) {
-		ResourceTracker.uncache(p);
-		StatTracker.uncache(p);
-		rbd.uncache(p);
-	}
+    public void onLogout(Player p) {
+        ResourceTracker.uncache(p);
+        StatTracker.uncache(p);
+        rbd.uncache(p);
+    }
 
 }
