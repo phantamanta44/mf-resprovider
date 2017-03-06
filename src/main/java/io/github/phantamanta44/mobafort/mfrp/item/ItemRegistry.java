@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class ItemRegistry {
 
@@ -34,6 +35,10 @@ public class ItemRegistry {
 
 	public static IItem get(String id) {
 		return itemMap.get(id);
+	}
+
+	public static Stream<IItem> stream() {
+		return itemMap.values().stream();
 	}
 
 }

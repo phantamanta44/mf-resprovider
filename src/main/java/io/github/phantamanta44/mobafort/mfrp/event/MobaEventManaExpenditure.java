@@ -7,6 +7,10 @@ import org.bukkit.event.HandlerList;
 
 public class MobaEventManaExpenditure extends Event {
 
+	public static HandlerList getHandlerList() {
+		return hl;
+	}
+
 	private static final HandlerList hl = new HandlerList();
 
 	private final Player player;

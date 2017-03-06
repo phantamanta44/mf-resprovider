@@ -14,7 +14,7 @@ public abstract class MutableStat<T extends Number> extends AbstractStat<T> {
 
 	@Override
 	public boolean isMutable() {
-		return super.isMutable();
+		return true;
 	}
 
 	@Override

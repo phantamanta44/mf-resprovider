@@ -10,6 +10,10 @@ public class MobaEventHeal extends Event {
 
 	private static final HandlerList hl = new HandlerList();
 
+	public static HandlerList getHandlerList() {
+		return hl;
+	}
+
 	private final Player source;
 	private final LivingEntity target;
 	private int amount;

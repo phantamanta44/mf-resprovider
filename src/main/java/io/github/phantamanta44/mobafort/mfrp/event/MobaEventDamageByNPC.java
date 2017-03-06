@@ -11,6 +11,10 @@ public class MobaEventDamageByNPC extends Event {
 
 	private static final HandlerList hl = new HandlerList();
 
+	public static HandlerList getHandlerList() {
+		return hl;
+	}
+
 	private final IStatted source;
 	private final LivingEntity target;
 	private final Damage damage;

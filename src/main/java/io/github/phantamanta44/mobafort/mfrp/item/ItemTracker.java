@@ -24,7 +24,7 @@ public class ItemTracker {
 			Bukkit.getServer().getOnlinePlayers().forEach(p -> {
 				MutableInt count = new MutableInt();
 				Arrays.stream(p.getInventory().getContents())
-						.filter(i -> i != null)
+						.filter(Objects::nonNull)
 						.forEach(i -> {
 							IItem item = ItemRegistry.get(i);
 							if (item != null) {
@@ -52,7 +52,7 @@ public class ItemTracker {
 
 	public static Collection<Map.Entry<ItemStack, IItem>> get(Player player) {
 		return Arrays.stream(player.getInventory().getContents())
-				.filter(i -> i != null)
+				.filter(Objects::nonNull)
 				.map(i -> new AbstractMap.SimpleImmutableEntry<>(i, ItemRegistry.get(i)))
 				.filter(e -> e.getValue() != null)
 				.collect(Collectors.toList());

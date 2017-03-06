@@ -74,11 +74,7 @@ public class ResourceTracker {
 	}
 
 	private static ResourceInfo getOrCreateEntry(UUID key) {
-		ResourceInfo info = resMap.get(key);
-		if (info == null) {
-			info = new ResourceInfo();
-			resMap.put(key, info);
-		}
+		ResourceInfo info = resMap.computeIfAbsent(key, k -> new ResourceInfo());
 		return info;
 	}
 

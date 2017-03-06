@@ -1,5 +1,6 @@
 package io.github.phantamanta44.mobafort.mfrp.event;
 
+import io.github.phantamanta44.mobafort.mfrp.item.ItemRegistry;
 import io.github.phantamanta44.mobafort.mfrp.stat.StatTracker;
 import io.github.phantamanta44.mobafort.weaponize.stat.IStat;
 import io.github.phantamanta44.mobafort.weaponize.stat.Stats;
@@ -24,6 +25,9 @@ public class RPCommandExecutor implements CommandExecutor {
 				switch (args[0].toLowerCase()) {
 					case "stats":
 						cmdStats(sender);
+						break;
+					case "items":
+						cmdItems(sender);
 						break;
 					case "hp":
 					case "mana":
@@ -54,6 +58,13 @@ public class RPCommandExecutor implements CommandExecutor {
 		sender.sendMessage(msg.toArray(new String[msg.size()]));
 	}
 
+	private static void cmdItems(CommandSender sender) {
+		sender.sendMessage("Known items:");
+		sender.sendMessage(ItemRegistry.stream()
+				.map(i -> String.format("%s:%d -> %s", i.getType().material, i.getType().meta, i.getId()))
+				.toArray(String[]::new));
+	}
+
 	private static void cmdMutate(CommandSender sender, String[] args) {
 		if (playerCheckFailed(sender) || argCountCheckFailed(sender, args, 2))
 			return;
@@ -68,7 +79,7 @@ public class RPCommandExecutor implements CommandExecutor {
 	}
 
 	private static void msgHelpNoArgs(CommandSender r) {
-		r.sendMessage("/mfrp <stats|hp|mana>");
+		r.sendMessage("/mfrp <stats|items|hp|mana>");
 	}
 
 	private static boolean playerCheckFailed(CommandSender sender) {

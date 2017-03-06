@@ -10,6 +10,10 @@ public class MobaEventApplyCC extends Event {
 
 	private static final HandlerList hl = new HandlerList();
 
+	public static HandlerList getHandlerList() {
+		return hl;
+	}
+
 	private Player target, source;
 	private CrowdControl type;
 	private boolean cancelled;
