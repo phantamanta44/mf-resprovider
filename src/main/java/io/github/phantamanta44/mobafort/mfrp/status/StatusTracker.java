@@ -39,13 +39,17 @@ public class StatusTracker {
     }
 
     public static void inflict(Player player, String id, int amt) {
+        inflict(player, id, amt, null);
+    }
+
+    public static void inflict(Player player, String id, int amt, Player src) {
         IStatus status = registry.get(id);
         if (status == null || amt < 1)
             throw new IllegalArgumentException();
         TimedDecayMap<IStatus> map = getOrCreateMap(player.getUniqueId());
         if (status instanceof ICCStatus) {
             CrowdControl cc = ((ICCStatus)status).getCrowdControl(player, amt);
-            MobaEventApplyCC event = MobaEventApplyCC.fire(null, player, cc); // TODO Somehow pass the source player here
+            MobaEventApplyCC event = MobaEventApplyCC.fire(src, player, cc);
             if (event.isCancelled())
                 return;
         }

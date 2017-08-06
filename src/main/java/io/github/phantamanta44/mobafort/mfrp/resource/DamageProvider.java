@@ -1,8 +1,9 @@
 package io.github.phantamanta44.mobafort.mfrp.resource;
 
 import io.github.phantamanta44.mobafort.mfrp.event.MobaEventDamage;
-import io.github.phantamanta44.mobafort.mfrp.event.MobaEventDamageByNPC;
+import io.github.phantamanta44.mobafort.mfrp.event.MobaEventDamageByPlayer;
 import io.github.phantamanta44.mobafort.mfrp.event.MobaEventHeal;
+import io.github.phantamanta44.mobafort.mfrp.event.MobaEventKilled;
 import io.github.phantamanta44.mobafort.mfrp.stat.StatTracker;
 import io.github.phantamanta44.mobafort.weaponize.stat.Damage;
 import io.github.phantamanta44.mobafort.weaponize.stat.IDamageProvider;
@@ -16,7 +17,7 @@ public class DamageProvider implements IDamageProvider {
 
     @Override
     public void damageEntity(Damage dmg, Player src, LivingEntity target) {
-        MobaEventDamage event = MobaEventDamage.fire(src, target, dmg);
+        MobaEventDamageByPlayer event = MobaEventDamageByPlayer.fire(src, target, dmg);
         if (event.isCancelled())
             return;
         MutableDouble amt = new MutableDouble(dmg.getBaseDmg());
@@ -45,6 +46,11 @@ public class DamageProvider implements IDamageProvider {
                 ResourceTracker.addHp(src, (int)(amt.intValue() * steal), StatTracker.getStat(src, Stats.HP_MAX).getValue());
             }
             ResourceTracker.addHp(tgt, -amt.intValue(), StatTracker.getStat(tgt, Stats.HP_MAX).getValue());
+            if (ResourceTracker.isDead(tgt)) {
+                MobaEventKilled killEvent = MobaEventKilled.fire(src, tgt); // TODO track assists somehow
+                if (killEvent.isCancelled())
+                    ResourceTracker.setHp(tgt, 1);
+            }
         } else if (target instanceof IStatted) {
             IStatted tgt = (IStatted)target;
             if (dmg.getType() != Damage.DamageType.TRUE) {
@@ -74,7 +80,7 @@ public class DamageProvider implements IDamageProvider {
 
     @Override
     public void damageEntity(Damage dmg, IStatted src, LivingEntity target) {
-        MobaEventDamageByNPC event = MobaEventDamageByNPC.fire(src, target, dmg);
+        MobaEventDamage event = MobaEventDamage.fire(src, target, dmg);
         if (event.isCancelled())
             return;
         MutableDouble amt = new MutableDouble(dmg.getBaseDmg());
@@ -98,7 +104,11 @@ public class DamageProvider implements IDamageProvider {
                 else
                     amt.setValue(amt.doubleValue() * (2 - (100 / (100 - dmgRed))));
             }
-            ResourceTracker.addHp(tgt, -amt.intValue(), StatTracker.getStat(tgt, Stats.HP_MAX).getValue());
+            if (ResourceTracker.isDead(tgt)) {
+                MobaEventKilled killEvent = MobaEventKilled.fire(src, tgt); // TODO track assists somehow
+                if (killEvent.isCancelled()) // TODO delegate damage to a player if possible
+                    ResourceTracker.setHp(tgt, 1);
+            }
         } else if (target instanceof IStatted) {
             IStatted tgt = (IStatted)target;
             if (dmg.getType() != Damage.DamageType.TRUE) {

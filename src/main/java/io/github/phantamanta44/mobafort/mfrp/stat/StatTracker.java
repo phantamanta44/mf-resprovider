@@ -23,9 +23,11 @@ public class StatTracker {
     public static final int SRC_BASE = 0b100;
 
     private static Map<UUID, StatCache> cached;
+    private static Map<UUID, Collection<ProvidedStat<?>>> baseStats;
 
     public static void init() {
         cached = new HashMap<>();
+        baseStats = new HashMap<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -42,6 +44,15 @@ public class StatTracker {
             default:
                 return getCached(player).getStat(stat);
         }
+    }
+
+    public static void updateBaseStats(Player player, Collection<ProvidedStat<?>> stats) {
+        baseStats.put(player.getUniqueId(), stats);
+        updateBaseStats(player);
+    }
+
+    public static void updateBaseStats(Player player) {
+        rescan(player, SRC_BASE);
     }
 
     public static void rescan(Player player, int toUpdate) {
@@ -107,12 +118,7 @@ public class StatTracker {
             }
             if ((goal & SRC_BASE) != 0) {
                 removeProviders(SRC_BASE);
-                addProvider(new ProvidedStat<>(Stats.HP_MAX, 3100, SRC_BASE, ProvidedStat.ReduceType.ADD));
-                addProvider(new ProvidedStat<>(Stats.MANA_MAX, 3000, SRC_BASE, ProvidedStat.ReduceType.ADD));
-                addProvider(new ProvidedStat<>(Stats.AP, 250, SRC_BASE, ProvidedStat.ReduceType.ADD));
-                addProvider(new ProvidedStat<>(Stats.AD, 151, SRC_BASE, ProvidedStat.ReduceType.ADD));
-                addProvider(new ProvidedStat<>(Stats.MOVE_SPEED, 460, SRC_BASE, ProvidedStat.ReduceType.ADD));
-                // TODO Implement
+                baseStats.get(player.getUniqueId()).forEach(this::addProvider);
             }
             ResourceTracker.capResources(player, getStat(Stats.HP_MAX).getValue(), getStat(Stats.MANA_MAX).getValue());
         }

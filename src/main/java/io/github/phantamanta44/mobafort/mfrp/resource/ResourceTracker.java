@@ -65,6 +65,11 @@ public class ResourceTracker {
         ri.mana = MathUtils.clamp(ri.mana, 0, manaMax);
     }
 
+    public static boolean isDead(Player player) {
+        ResourceInfo ri = getInfo(player);
+        return ri != null && ri.hp <= 0;
+    }
+
     public static ResourceInfo getInfo(Player player) {
         return getOrCreateEntry(player.getUniqueId());
     }
@@ -74,8 +79,7 @@ public class ResourceTracker {
     }
 
     private static ResourceInfo getOrCreateEntry(UUID key) {
-        ResourceInfo info = resMap.computeIfAbsent(key, k -> new ResourceInfo());
-        return info;
+        return resMap.computeIfAbsent(key, k -> new ResourceInfo());
     }
 
     public static class ResourceInfo {
